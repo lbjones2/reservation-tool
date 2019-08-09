@@ -17,12 +17,12 @@ import requests
 import time
 
 #Global variables for user to input
-dateStr = "05/09/2019"
-
-#Future updates will have ability to set party size and exact time
+dateStr = "05/09/2019" #Change date as Needed
+#Future updates will have ability to set party size and exact time - Default party size is 2
 #partySizeStr = "4"
 #primaryTimeStr = '2:00 PM'
 
+#Function to set up email 
 def emailFun():
     try:
         #Creating basic message to send over email
@@ -33,12 +33,15 @@ def emailFun():
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.ehlo()
         server.starttls()
+
+        ###############################################################################
         #Enter user email and password HERE: 'email','password' (must be gmail account)
+        ###############################################################################
         server.login('', '')
         
         #Formatting message
         msg['Subject'] = 'Open Reservation'
-        #Enter sneder email HERE 'email'
+        #Enter sender email HERE 'email'
         msg['From'] = ''
         #Enter recepitent emails HERE: 'email,email,...'
         msg['To'] = ''
@@ -49,6 +52,7 @@ def emailFun():
     except:
         print('Something went wrong...')
 
+#Function returning wether or not a reservation is found for the requested date
 def botFun():
     #open up the webpage in chrome (enter your own chromedriver executable path)
     browser = webdriver.Chrome(executable_path='/Users/lucas/Documents/Bot/chromedriver')
@@ -97,19 +101,26 @@ def botFun():
     #Logic to see if a reservation is avaliable
     try:
         browser.find_element_by_class_name('ctaNoAvailableTimesContainer')
+        browser.close()
         #If the reservation not avaliable indicator is found
         return False
     except NoSuchElementException: 
-        #If notAvaliable element is not found 
+        #If notAvaliable element is not found
+        browser.close()
         return True
- 
-#User of the script has not received an email
-noEmail = True
 
-#While the user has not received an email
-while(noEmail == True):
-    resAvail = botFun()
-    print(resAvail)
-    if(resAvail == True):
-        emailFun()
-        noEmail = False
+#Main Function
+def main():
+    #User of the script has not received an email
+    noEmail = True
+
+    #While the user has not received an email check for reservations
+    while(noEmail == True):
+        resAvail = botFun()
+        print(resAvail)
+        if(resAvail == True):
+            emailFun()
+            noEmail = False
+
+if (__name__ == '__main__'):
+    main()
